@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YouTube Dark Channel — Curso Interativo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            accent: {
+              red: '#FF0000',
+              cyan: '#22d3ee',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone@7.26.0/babel.min.js"></script>
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .scrollbar-thin::-webkit-scrollbar { width: 6px; }
+    .scrollbar-thin::-webkit-scrollbar-track { background: #18181b; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
+    .prose-dark h2 { @apply text-xl font-bold text-zinc-100 mt-8 mb-3; }
+    .prose-dark h3 { @apply text-lg font-semibold text-zinc-200 mt-6 mb-2; }
+    .prose-dark p { @apply text-zinc-300 leading-relaxed mb-4; }
+    .prose-dark ul { @apply list-disc list-inside text-zinc-300 space-y-1 mb-4; }
+    .prose-dark ol { @apply list-decimal list-inside text-zinc-300 space-y-1 mb-4; }
+    .prose-dark li { @apply text-zinc-300; }
+    .toast-enter { animation: toastIn 0.3s ease-out; }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100 antialiased">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useRef, useCallback } = React;
+
+    // ========== DADOS DO CURSO ==========
+    const COURSE_DATA = {
+      title: "Criando um Canal Dark Monetizado no YouTube",
+      subtitle: "Do zero à monetização com IA — faceless, escalável e lucrativo",
+      modules: [
+        {
+          id: "mod1",
+          number: 1,
+          title: "Nicho & Validação",
+          shortTitle: "Nicho & Validação",
+          icon: "target",
+          description: "Escolha o nicho certo usando a Matriz RPM vs Escala e valide antes de investir tempo.",
+          content: {
+            intro: "O sucesso de um canal dark começa pela escolha do nicho. Não basta gostar do tema — ele precisa ter demanda, RPM atrativo e possibilidade de escala com conteúdo gerado por IA.",
+            sections: [
+              {
+                type: "text",
+                title: "O que é um Canal Dark?",
+                body: "Canais dark (ou faceless) são canais sem o rosto do criador. Todo o conteúdo é produzido com voz sintética, imagens/vídeos de stock ou gerados por IA, e edição automatizada. Isso permite escalar produção e operar múltiplos canais."
+              },
+              {
+                type: "text",
+                title: "Matriz RPM × Escala",
+                body: "Antes de criar o canal, classifique o nicho em duas dimensões:\n\n• RPM (Receita por mil visualizações): quanto o YouTube paga em média.\n• Escala: facilidade de produzir muitos vídeos de forma repetível com IA.\n\nNichos ideais ficam no quadrante alto RPM + alta escala."
+              },
+              {
+                type: "table",
+                title: "Exemplos de Nichos por Quadrante",
+                headers: ["Nicho", "RPM Estimado", "Escala com IA", "Recomendação"],
+                rows: [
+                  ["Finanças & Investimentos", "Alto (R$ 15–40)", "Média", "Excelente se validado"],
+                  ["Histórias de Terror / Creepypasta", "Médio (R$ 8–18)", "Alta", "Ótimo para iniciantes"],
+                  ["Fatos Curiosos / Top 10", "Médio-Baixo", "Muito Alta", "Bom volume, RPM moderado"],
+                  ["Motivação & Citações", "Baixo–Médio", "Alta", "Saturado — cuidado"],
+                  ["Saúde & Bem-estar", "Alto", "Média", "Exige cuidado com guidelines"],
+                  ["True Crime", "Alto", "Média-Alta", "Excelente, mas competitivo"]
+                ]
+              },
+              {
+                type: "calculator",
+                title: "Calculadora de Receita Estimada (RPM)"
+              },
+              {
+                type: "text",
+                title: "Como Validar um Nicho",
+                body: "1. Pesquise no YouTube Search e veja se há canais com 10k–500k inscritos crescendo.\n2. Use ferramentas como vidIQ ou TubeBuddy para ver volume de busca e competição.\n3. Analise os vídeos mais recentes dos top canais: quantos views em 7/30 dias?\n4. Teste 3–5 títulos e thumbnails antes de gravar o primeiro vídeo.\n5. Prefira nichos evergreen + com picos sazonais."
+              },
+              {
+                type: "prompt",
+                title: "Prompt de Validação de Nicho (ChatGPT)",
+                code: `Atue como especialista em YouTube e análise de nichos.\n\nAnalise o seguinte nicho: [SEU NICHO AQUI]\n\nForneça:\n1. Estimativa de RPM médio no Brasil e em inglês\n2. Nível de competição (baixo/médio/alto)\n3. Facilidade de produção com IA (roteiro + voz + imagens)\n4. 5 ideias de vídeos com alto potencial de CTR\n5. 3 canais de referência (com faixa de inscritos)\n6. Riscos de monetização ou guidelines\n7. Veredito final: Vale a pena em 2025? (Sim/Não + justificativa)`
+              }
+            ]
+          }
+        },
+        {
+          id: "mod2",
+          number: 2,
+          title: "Tech Stack",
+          shortTitle: "Tech Stack",
+          icon: "cpu",
+          description: "As ferramentas essenciais: ChatGPT, ElevenLabs, Leonardo.ai e o fluxo de produção.",
+          content: {
+            intro: "O stack moderno de um canal dark é quase 100% baseado em IA. Abaixo está a combinação mais eficiente custo × qualidade em 2025.",
+            sections: [
+              {
+                type: "text",
+                title: "Visão Geral do Fluxo",
+                body: "1. Ideia + Roteiro → ChatGPT / Claude\n2. Voz → ElevenLabs (ou alternatives)\n3. Imagens / Vídeos → Leonardo.ai, Midjourney, Runway, Pika\n4. Edição → CapCut (gratuito) ou Premiere + plugins\n5. Thumbnail → Canva + Leonardo ou Photoshop\n6. Upload + SEO → YouTube Studio + vidIQ"
+              },
+              {
+                type: "table",
+                title: "Comparativo de Ferramentas",
+                headers: ["Ferramenta", "Função", "Custo aprox.", "Melhor para", "Alternativa"],
+                rows: [
+                  ["ChatGPT-4o / Claude 3.5", "Roteiros & ideias", "US$ 20/mês", "Qualidade de texto", "Gemini, Grok"],
+                  ["ElevenLabs", "Voz sintética", "US$ 5–22/mês", "Naturalidade", "PlayHT, Speechify"],
+                  ["Leonardo.ai", "Imagens IA", "Grátis–US$ 12", "Consistência de estilo", "Midjourney, Flux"],
+                  ["CapCut", "Edição de vídeo", "Grátis", "Iniciantes & velocidade", "DaVinci, Premiere"],
+                  ["Canva Pro", "Thumbnails", "US$ 15/mês", "Velocidade", "Photoshop + IA"],
+                  ["vidIQ / TubeBuddy", "SEO & pesquisa", "Grátis–pago", "Keywords & tags", "Keyword Tool"]
+                ]
+              },
+              {
+                type: "prompt",
+                title: "Prompt de Roteiro Completo (ChatGPT)",
+                code: `Você é um roteirista especialista em canais dark de YouTube com alta retenção.\n\nCrie um roteiro completo para um vídeo de 8–12 minutos no nicho: [NICHO]\nTítulo tentativo: [TÍTULO]\n\nEstrutura obrigatória:\n1. Hook nos primeiros 8 segundos (pergunta ou afirmação chocante)\n2. Promessa clara do que o viewer vai aprender/descobrir\n3. Desenvolvimento em 4–6 blocos com transições naturais\n4. Loop de retenção a cada 45–60 segundos (mini-cliffhangers)\n5. CTA suave no meio e forte no final\n6. Duração estimada de cada bloco\n\nTom de voz: [misterioso / educativo / dramático]\nIdioma: Português brasileiro natural e fluido.\nNão use gírias excessivas. Foque em storytelling.`
+              },
+              {
+                type: "prompt",
+                title: "Prompt de Voz — ElevenLabs (Style)",
+                code: `Instruções de estilo para ElevenLabs:\n\n- Voz: masculina, grave, calma e autoritária (ou feminina suave e envolvente)\n- Velocidade: 0.95–1.05\n- Estabilidade: 60–75%\n- Clarity + Similarity: 70–85%\n- Estilo: narrativo documental / storytelling\n\nAntes de gerar, cole o roteiro completo e peça:\n\"Leia o texto abaixo com pausas naturais, ênfase nas palavras-chave e tom envolvente.\"`
+              },
+              {
+                type: "text",
+                title: "Dicas de Economia",
+                body: "• Comece com os planos gratuitos ou mais baratos.\n• Reutilize vozes e estilos de imagem consistentes para branding.\n• Gere imagens em lote no Leonardo com o mesmo seed/style.\n• CapCut Desktop + templates prontos economiza horas."
+              }
+            ]
+          }
+        },
+        {
+          id: "mod3",
+          number: 3,
+          title: "Scripting & Edição",
+          shortTitle: "Scripting & Edição",
+          icon: "clapperboard",
+          description: "Regras de retenção, estrutura de roteiro e fluxo de edição no CapCut/Premiere.",
+          content: {
+            intro: "A retenção é o que determina se o algoritmo impulsiona seu vídeo. Roteiro + edição precisam trabalhar juntos para manter o viewer até o final.",
+            sections: [
+              {
+                type: "text",
+                title: "As 7 Regras de Ouro da Retenção",
+                body: "1. Hook visual + verbal nos primeiros 3–8 segundos.\n2. Promessa clara logo em seguida.\n3. Pattern interrupt a cada 40–60 segundos (mudança de cena, zoom, som).\n4. Nunca deixe mais de 2–3 segundos de imagem estática.\n5. Use open loops (\"o que aconteceu depois vai te surpreender...\").\n6. Mantenha o ritmo: frases curtas + pausas estratégicas.\n7. CTA no final + end screen com próximo vídeo."
+              },
+              {
+                type: "text",
+                title: "Estrutura de Roteiro Recomendada (8–12 min)",
+                body: "• 0:00–0:15 → Hook + Promessa\n• 0:15–1:30 → Contexto / Setup\n• 1:30–7:00 → Desenvolvimento (3–5 blocos)\n• 7:00–9:00 → Clímax / Revelação principal\n• 9:00–10:30 → Conclusão + valor extra\n• 10:30–fim → CTA + end screen"
+              },
+              {
+                type: "table",
+                title: "CapCut vs Premiere — Quando usar cada um",
+                headers: ["Critério", "CapCut", "Premiere Pro"],
+                rows: [
+                  ["Custo", "Gratuito", "Assinatura Adobe"],
+                  ["Curva de aprendizado", "Muito baixa", "Alta"],
+                  ["Velocidade de edição", "Excelente", "Boa (com atalhos)"],
+                  ["Efeitos / Transições", "Bons e fáceis", "Profissionais"],
+                  ["Exportação 4K / qualidade", "Boa", "Excelente"],
+                  ["Recomendado para", "Iniciantes e volume", "Canais premium / longos"]
+                ]
+              },
+              {
+                type: "prompt",
+                title: "Prompt de Revisão de Retenção",
+                code: `Analise o roteiro abaixo como um especialista em retenção de YouTube.\n\nPara cada bloco de 30–45 segundos, diga:\n1. Risco de drop-off (baixo/médio/alto)\n2. Sugestão de pattern interrupt ou visual\n3. Frase que pode ser transformada em open loop\n4. Onde adicionar zoom, texto na tela ou sound effect\n\nRoteiro:\n[COLE O ROTEIRO AQUI]`
+              },
+              {
+                type: "text",
+                title: "Checklist de Edição Rápida (CapCut)",
+                body: "□ Importar áudio + imagens/vídeos\n□ Cortar silêncios longos (>0.8s)\n□ Adicionar zoom suave a cada 8–12s\n□ Textos na tela nas partes-chave\n□ Transições rápidas (fade ou cut)\n□ Música de fundo em volume baixo (−18 a −25 dB)\n□ Sound effects em momentos de impacto\n□ Exportar em 1080p 30/60fps, bitrate alto"
+              }
+            ]
+          }
+        },
+        {
+          id: "mod4",
+          number: 4,
+          title: "CTR, Thumbnails & SEO",
+          shortTitle: "CTR & SEO",
+          icon: "mouse-pointer-click",
+          description: "Como criar títulos e thumbnails que geram cliques e ranqueiam no algoritmo.",
+          content: {
+            intro: "Você pode ter o melhor vídeo do mundo, mas se o CTR for baixo, o YouTube não vai distribuí-lo. Título + Thumbnail = 70% do sucesso inicial.",
+            sections: [
+              {
+                type: "text",
+                title: "Fórmula de Título de Alta CTR",
+                body: "• Número + Benefício + Curiosidade\n• \"O que ninguém te conta sobre...\"\n• \"X coisas que...\" / \"O erro que...\"\n• Palavras de poder: secreto, proibido, chocante, verdade, revelado\n• Evite clickbait extremo (prejudica retenção e monetização)"
+              },
+              {
+                type: "table",
+                title: "Exemplos de Títulos & Thumbnails",
+                headers: ["Título", "Elemento da Thumbnail", "Por que funciona"],
+                rows: [
+                  ["O Segredo dos Canais que Faturam R$ 50k/mês", "Rosto chocado + seta + dinheiro", "Curiosidade + prova social"],
+                  ["5 Nichos Dark que Ninguém Está Explorando em 2025", "Número grande + fundo misterioso", "Lista + escassez"],
+                  ["Por que seu Canal Dark Não Cresce (e como resolver)", "Problema + solução visual", "Dor do público"],
+                  ["Eu Testei a IA que Cria Vídeos Sozinha...", "Before/After ou tela de IA", "Prova + novidade"],
+                  ["A Verdade Sobre Monetização de Canais Faceless", "Texto grande + expressão séria", "Autoridade + revelação"]
+                ]
+              },
+              {
+                type: "text",
+                title: "Regras de Thumbnail que Convertem",
+                body: "1. Rosto com emoção forte (mesmo em canais dark use stock ou IA).\n2. Texto grande e legível no celular (máx. 3–5 palavras).\n3. Contraste alto (cores vibrantes no fundo escuro).\n4. Elemento de curiosidade (seta, círculo, interrogação).\n5. Consistência de estilo para branding do canal.\n6. Teste A/B sempre que possível."
+              },
+              {
+                type: "prompt",
+                title: "Prompt de Geração de Títulos + Thumbnail Ideas",
+                code: `Atue como copywriter especialista em CTR de YouTube.\n\nNicho: [SEU NICHO]\nTema do vídeo: [TEMA]\n\nGere:\n1. 10 títulos otimizados para CTR (misturando fórmulas)\n2. Para os 3 melhores títulos, descreva a thumbnail ideal (composição, cores, texto, emoção)\n3. 5 tags principais + 10 tags secundárias\n4. Descrição SEO-friendly (primeiros 150 caracteres + corpo)\n\nIdioma: Português brasileiro.`
+              },
+              {
+                type: "text",
+                title: "SEO Básico que Ainda Funciona",
+                body: "• Keyword principal no título (se natural)\n• Keyword no início da descrição\n• Tags relevantes (não encha de tags irrelevantes)\n• Cards e end screens apontando para outros vídeos\n• Playlists temáticas\n• Consistência de upload (mesmo dia/horário)"
+              }
+            ]
+          }
+        },
+        {
+          id: "mod5",
+          number: 5,
+          title: "Monetização & Escala",
+          shortTitle: "Monetização & Escala",
+          icon: "trending-up",
+          description: "Requisitos de monetização, múltiplas fontes de receita e como escalar para vários canais.",
+          content: {
+            intro: "Monetizar é só o começo. O verdadeiro potencial dos canais dark está na escala: múltiplos canais, produtos digitais e automação.",
+            sections: [
+              {
+                type: "text",
+                title: "Requisitos Atuais de Monetização (YouTube)",
+                body: "• 1.000 inscritos\n• 4.000 horas de watch time nos últimos 12 meses\n  OU 10 milhões de views em Shorts nos últimos 90 dias\n• Cumprir as políticas de monetização e guidelines da comunidade\n• Conta AdSense verificada\n\nCanais dark precisam tomar cuidado extra com conteúdo reutilizado, enganoso ou que viole direitos autorais."
+              },
+              {
+                type: "table",
+                title: "Fontes de Receita Além do AdSense",
+                headers: ["Fonte", "Potencial", "Dificuldade", "Quando começar"],
+                rows: [
+                  ["AdSense (YouTube)", "Médio–Alto", "Baixa", "Após YPP"],
+                  ["Super Thanks / Membros", "Baixo–Médio", "Baixa", "Após 1k inscritos"],
+                  ["Afiliados (Amazon, Hotmart...)", "Alto", "Média", "Desde o início"],
+                  ["Produtos digitais (e-books, packs)", "Alto", "Média", "Após autoridade"],
+                  ["Patrocínios / Brand deals", "Muito Alto", "Alta", "Após 50k+ views/vídeo"],
+                  ["Canais em outros idiomas", "Alto", "Média", "Após validar 1 canal"]
+                ]
+              },
+              {
+                type: "text",
+                title: "Estratégia de Escala",
+                body: "1. Valide 1 canal até monetizar e ter processo estável.\n2. Documente o SOP (Standard Operating Procedure) completo.\n3. Contrate ou automatize partes (vozes, edição, thumbnails).\n4. Lance o 2º canal em nicho relacionado ou idioma diferente.\n5. Use a mesma stack + templates.\n6. Reinvista lucro em ads (opcional) ou melhores ferramentas.\n7. Meta realista: 3–5 canais gerando receita em 12–18 meses."
+              },
+              {
+                type: "prompt",
+                title: "Prompt de Plano de Escala",
+                code: `Você é um consultor de canais YouTube dark.\n\nCom base nas informações abaixo, crie um plano de escala de 6 meses:\n\n- Nicho atual: [NICHO]\n- Status atual: [inscritos / views médios / já monetizado?]\n- Tempo disponível por semana: [horas]\n- Orçamento mensal para ferramentas: [R$]\n\nO plano deve incluir:\n1. Metas mensais (inscritos, vídeos, receita)\n2. O que automatizar primeiro\n3. Quando lançar o segundo canal\n4. Possíveis produtos digitais\n5. Riscos e como mitigar`
+              },
+              {
+                type: "text",
+                title: "Avisos Importantes",
+                body: "• Nunca compre inscritos ou views.\n• Respeite copyright — use apenas músicas e imagens licenciadas ou geradas.\n• Evite conteúdo que viole as políticas de conteúdo reutilizado.\n• Diversifique fontes de receita desde cedo.\n• Trate como negócio: registre tudo e pague impostos corretamente."
+              }
+            ]
+          }
+        }
+      ]
+    };
+
+    // ========== UTILITÁRIOS ==========
+    const STORAGE_KEY = "yt-dark-course-progress";
+
+    function loadProgress() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : { completed: [], currentModule: "mod1" };
+      } catch {
+        return { completed: [], currentModule: "mod1" };
+      }
+    }
+
+    function saveProgress(progress) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
+    }
+
+    // ========== COMPONENTES ==========
+    function toPascal(str) {
+      return str.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join("");
+    }
+
+    function Icon({ name, size = 20, className = "" }) {
+      const ref = useRef(null);
+      useEffect(() => {
+        if (ref.current && window.lucide) {
+          ref.current.innerHTML = "";
+          const pascal = toPascal(name);
+          const iconNode = window.lucide.icons[pascal] || window.lucide[pascal] || window.lucide.icons.Circle || window.lucide.Circle;
+          if (!iconNode) return;
+          const icon = window.lucide.createElement(iconNode);
+          icon.setAttribute("width", size);
+          icon.setAttribute("height", size);
+          if (className) icon.setAttribute("class", className);
+          ref.current.appendChild(icon);
+        }
+      }, [name, size, className]);
+      return <span ref={ref} className="inline-flex items-center justify-center" />;
+    }
+
+    function Toast({ message, onClose }) {
+      useEffect(() => {
+        const t = setTimeout(onClose, 2200);
+        return () => clearTimeout(t);
+      }, [onClose]);
+      return (
+        <div className="fixed bottom-6 right-6 z-50 toast-enter">
+          <div className="flex items-center gap-3 bg-zinc-800 border border-zinc-700 text-zinc-100 px-4 py-3 rounded-xl shadow-2xl">
+            <Icon name="check-circle" size={18} className="text-cyan-400" />
+            <span className="text-sm font-medium">{message}</span>
+          </div>
+        </div>
+      );
+    }
+
+    function CopyButton({ text }) {
+      const [copied, setCopied] = useState(false);
+      const handleCopy = async () => {
+        try {
+          await navigator.clipboard.writeText(text);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        } catch (e) {
+          console.error(e);
+        }
+      };
+      return (
+        <button
+          onClick={handleCopy}
+          className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded-lg bg-zinc-700 hover:bg-zinc-600 text-zinc-200 transition-colors"
+        >
+          <Icon name={copied ? "check" : "copy"} size={14} />
+          {copied ? "Copiado!" : "Copiar Prompt"}
+        </button>
+      );
+    }
+
+    function PromptBlock({ title, code }) {
+      return (
+        <div className="my-6 rounded-xl border border-zinc-700 overflow-hidden bg-zinc-900/80">
+          <div className="flex items-center justify-between px-4 py-2.5 bg-zinc-800/80 border-b border-zinc-700">
+            <span className="text-sm font-medium text-zinc-300 flex items-center gap-2">
+              <Icon name="terminal" size={16} className="text-cyan-400" />
+              {title}
+            </span>
+            <CopyButton text={code} />
+          </div>
+          <pre className="p-4 text-sm text-zinc-300 overflow-x-auto whitespace-pre-wrap font-mono leading-relaxed">
+            {code}
+          </pre>
+        </div>
+      );
+    }
+
+    function DataTable({ title, headers, rows }) {
+      return (
+        <div className="my-6">
+          {title && <h3 className="text-lg font-semibold text-zinc-200 mb-3">{title}</h3>}
+          <div className="overflow-x-auto rounded-xl border border-zinc-700">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-zinc-800/90">
+                  {headers.map((h, i) => (
+                    <th key={i} className="px-4 py-3 text-left font-semibold text-zinc-200 whitespace-nowrap">
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row, ri) => (
+                  <tr key={ri} className={ri % 2 === 0 ? "bg-zinc-900/50" : "bg-zinc-900/20"}>
+                    {row.map((cell, ci) => (
+                      <td key={ci} className="px-4 py-3 text-zinc-300 border-t border-zinc-800">
+                        {cell}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
+    function RPMCalculator() {
+      const [views, setViews] = useState(10000);
+      const [rpm, setRpm] = useState(12);
+      const revenue = ((views / 1000) * rpm).toFixed(2);
+
+      return (
+        <div className="my-6 p-5 rounded-xl border border-cyan-500/30 bg-gradient-to-br from-zinc-900 to-zinc-900/50">
+          <h3 className="text-lg font-semibold text-zinc-100 mb-1 flex items-center gap-2">
+            <Icon name="calculator" size={20} className="text-cyan-400" />
+            Calculadora de Receita Estimada (RPM)
+          </h3>
+          <p className="text-sm text-zinc-400 mb-5">Views × (RPM / 1000) = Receita estimada</p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+            <div>
+              <label className="block text-xs font-medium text-zinc-400 mb-1.5">Visualizações</label>
+              <input
+                type="number"
+                min="0"
+                value={views}
+                onChange={(e) => setViews(Number(e.target.value) || 0)}
+                className="w-full px-3 py-2.5 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-zinc-400 mb-1.5">RPM (R$ por 1.000 views)</label>
+              <input
+                type="number"
+                min="0"
+                step="0.5"
+                value={rpm}
+                onChange={(e) => setRpm(Number(e.target.value) || 0)}
+                className="w-full px-3 py-2.5 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between p-4 rounded-lg bg-zinc-800/80 border border-zinc-700">
+            <span className="text-zinc-400 text-sm">Receita estimada</span>
+            <span className="text-2xl font-bold text-cyan-400">R$ {Number(revenue).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</span>
+          </div>
+          <p className="text-xs text-zinc-500 mt-3">
+            * Valores aproximados. RPM real varia por nicho, país do público e temporada.
+          </p>
+        </div>
+      );
+    }
+
+    function ProgressBar({ completed, total }) {
+      const pct = total === 0 ? 0 : Math.round((completed / total) * 100);
+      return (
+        <div className="w-full">
+          <div className="flex justify-between text-xs text-zinc-400 mb-1.5">
+            <span>Progresso</span>
+            <span>{pct}%</span>
+          </div>
+          <div className="h-2 rounded-full bg-zinc-800 overflow-hidden">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-red-600 to-cyan-500 transition-all duration-500"
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+        </div>
+      );
+    }
+
+    function Sidebar({ modules, currentId, completed, onSelect, progressPct }) {
+      return (
+        <aside className="hidden lg:flex flex-col w-72 shrink-0 border-r border-zinc-800 bg-zinc-900/50 sticky top-0 h-screen">
+          <div className="p-5 border-b border-zinc-800">
+            <div className="flex items-center gap-2.5 mb-1">
+              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center">
+                <Icon name="play" size={18} className="text-white" />
+              </div>
+              <div>
+                <h1 className="font-bold text-sm leading-tight text-zinc-100">YouTube Dark</h1>
+                <p className="text-[11px] text-zinc-500">Curso Interativo</p>
+              </div>
+            </div>
+            <div className="mt-4">
+              <ProgressBar completed={completed.length} total={modules.length} />
+            </div>
+          </div>
+
+          <nav className="flex-1 overflow-y-auto scrollbar-thin p-3 space-y-1">
+            {modules.map((mod) => {
+              const isActive = mod.id === currentId;
+              const isDone = completed.includes(mod.id);
+              return (
+                <button
+                  key={mod.id}
+                  onClick={() => onSelect(mod.id)}
+                  className={`w-full flex items-start gap-3 px-3 py-3 rounded-xl text-left transition-all ${
+                    isActive
+                      ? "bg-zinc-800 border border-zinc-700 shadow-sm"
+                      : "hover:bg-zinc-800/60 border border-transparent"
+                  }`}
+                >
+                  <div
+                    className={`mt-0.5 w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
+                      isDone
+                        ? "bg-cyan-500/20 text-cyan-400"
+                        : isActive
+                        ? "bg-red-600/20 text-red-400"
+                        : "bg-zinc-800 text-zinc-500"
+                    }`}
+                  >
+                    {isDone ? (
+                      <Icon name="check" size={14} />
+                    ) : (
+                      <span className="text-xs font-bold">{mod.number}</span>
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <p className={`text-sm font-medium truncate ${isActive ? "text-zinc-100" : "text-zinc-300"}`}>
+                      {mod.shortTitle}
+                    </p>
+                    <p className="text-[11px] text-zinc-500 mt-0.5 line-clamp-1">{mod.description}</p>
+                  </div>
+                </button>
+              );
+            })}
+          </nav>
+
+          <div className="p-4 border-t border-zinc-800 text-center">
+            <p className="text-[11px] text-zinc-600">Progresso salvo automaticamente</p>
+          </div>
+        </aside>
+      );
+    }
+
+    function MobileNav({ modules, currentId, completed, onSelect, open, setOpen }) {
+      return (
+        <>
+          <header className="lg:hidden sticky top-0 z-40 bg-zinc-950/95 backdrop-blur border-b border-zinc-800 px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center">
+                <Icon name="play" size={16} className="text-white" />
+              </div>
+              <span className="font-bold text-sm">YouTube Dark</span>
+            </div>
+            <button
+              onClick={() => setOpen(!open)}
+              className="p-2 rounded-lg hover:bg-zinc-800"
+            >
+              <Icon name={open ? "x" : "menu"} size={20} />
+            </button>
+          </header>
+
+          {open && (
+            <div className="lg:hidden fixed inset-0 z-30 bg-zinc-950/80" onClick={() => setOpen(false)}>
+              <div
+                className="absolute top-14 left-0 right-0 bg-zinc-900 border-b border-zinc-800 p-3 space-y-1 max-h-[70vh] overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {modules.map((mod) => {
+                  const isActive = mod.id === currentId;
+                  const isDone = completed.includes(mod.id);
+                  return (
+                    <button
+                      key={mod.id}
+                      onClick={() => {
+                        onSelect(mod.id);
+                        setOpen(false);
+                      }}
+                      className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left ${
+                        isActive ? "bg-zinc-800" : "hover:bg-zinc-800/60"
+                      }`}
+                    >
+                      <div
+                        className={`w-7 h-7 rounded-lg flex items-center justify-center ${
+                          isDone ? "bg-cyan-500/20 text-cyan-400" : "bg-zinc-800 text-zinc-400"
+                        }`}
+                      >
+                        {isDone ? <Icon name="check" size={14} /> : <span className="text-xs font-bold">{mod.number}</span>}
+                      </div>
+                      <span className="text-sm font-medium">{mod.shortTitle}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </>
+      );
+    }
+
+    function ModuleContent({ module, isCompleted, onToggleComplete, onToast }) {
+      if (!module) return null;
+
+      const renderSection = (section, idx) => {
+        if (section.type === "text") {
+          return (
+            <div key={idx} className="mb-6">
+              <h3 className="text-lg font-semibold text-zinc-100 mb-2">{section.title}</h3>
+              {section.body.split("\n").map((line, i) => (
+                <p key={i} className="text-zinc-300 leading-relaxed mb-2 whitespace-pre-line">
+                  {line}
+                </p>
+              ))}
+            </div>
+          );
+        }
+        if (section.type === "table") {
+          return <DataTable key={idx} title={section.title} headers={section.headers} rows={section.rows} />;
+        }
+        if (section.type === "prompt") {
+          return <PromptBlock key={idx} title={section.title} code={section.code} />;
+        }
+        if (section.type === "calculator") {
+          return <RPMCalculator key={idx} />;
+        }
+        return null;
+      };
+
+      return (
+        <article className="max-w-3xl mx-auto">
+          <div className="mb-8">
+            <div className="flex items-center gap-2 text-sm text-zinc-500 mb-2">
+              <span className="px-2 py-0.5 rounded-md bg-zinc-800 text-zinc-400 font-medium">
+                Módulo {module.number}
+              </span>
+              {isCompleted && (
+                <span className="flex items-center gap-1 text-cyan-400 text-xs font-medium">
+                  <Icon name="check-circle" size={14} /> Concluído
+                </span>
+              )}
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-bold text-zinc-50 mb-2">{module.title}</h2>
+            <p className="text-zinc-400">{module.description}</p>
+          </div>
+
+          <div className="prose-dark">
+            <p className="text-zinc-300 leading-relaxed mb-6 text-base">{module.content.intro}</p>
+            {module.content.sections.map(renderSection)}
+          </div>
+
+          <div className="mt-10 pt-6 border-t border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-sm text-zinc-500">
+              {isCompleted ? "Você já concluiu este módulo." : "Marque como concluído para acompanhar seu progresso."}
+            </p>
+            <button
+              onClick={() => {
+                onToggleComplete(module.id);
+                onToast(isCompleted ? "Módulo desmarcado" : "Módulo marcado como concluído!");
+              }}
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium text-sm transition-all ${
+                isCompleted
+                  ? "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 border border-zinc-700"
+                  : "bg-gradient-to-r from-red-600 to-red-500 text-white hover:from-red-500 hover:to-red-400 shadow-lg shadow-red-900/30"
+              }`}
+            >
+              <Icon name={isCompleted ? "rotate-ccw" : "check"} size={16} />
+              {isCompleted ? "Desmarcar" : "Marcar como Concluído"}
+            </button>
+          </div>
+        </article>
+      );
+    }
+
+    // ========== APP PRINCIPAL ==========
+    function App() {
+      const [progress, setProgress] = useState(loadProgress);
+      const [mobileOpen, setMobileOpen] = useState(false);
+      const [toast, setToast] = useState(null);
+
+      const currentModule = COURSE_DATA.modules.find((m) => m.id === progress.currentModule) || COURSE_DATA.modules[0];
+
+      useEffect(() => {
+        saveProgress(progress);
+      }, [progress]);
+
+      const selectModule = (id) => {
+        setProgress((p) => ({ ...p, currentModule: id }));
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      };
+
+      const toggleComplete = (id) => {
+        setProgress((p) => {
+          const completed = p.completed.includes(id)
+            ? p.completed.filter((c) => c !== id)
+            : [...p.completed, id];
+          return { ...p, completed };
+        });
+      };
+
+      const showToast = (msg) => setToast(msg);
+
+      return (
+        <div className="min-h-screen flex flex-col lg:flex-row">
+          <MobileNav
+            modules={COURSE_DATA.modules}
+            currentId={progress.currentModule}
+            completed={progress.completed}
+            onSelect={selectModule}
+            open={mobileOpen}
+            setOpen={setMobileOpen}
+          />
+
+          <Sidebar
+            modules={COURSE_DATA.modules}
+            currentId={progress.currentModule}
+            completed={progress.completed}
+            onSelect={selectModule}
+          />
+
+          <main className="flex-1 min-w-0">
+            {/* Hero / Header da página */}
+            <div className="border-b border-zinc-800 bg-gradient-to-b from-zinc-900/80 to-zinc-950 px-4 sm:px-8 py-8 sm:py-10">
+              <div className="max-w-3xl mx-auto">
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-50 tracking-tight">
+                  {COURSE_DATA.title}
+                </h1>
+                <p className="mt-2 text-zinc-400 text-sm sm:text-base">{COURSE_DATA.subtitle}</p>
+                <div className="mt-5 lg:hidden">
+                  <ProgressBar completed={progress.completed.length} total={COURSE_DATA.modules.length} />
+                </div>
+              </div>
+            </div>
+
+            <div className="px-4 sm:px-8 py-8 sm:py-10">
+              <ModuleContent
+                module={currentModule}
+                isCompleted={progress.completed.includes(currentModule.id)}
+                onToggleComplete={toggleComplete}
+                onToast={showToast}
+              />
+            </div>
+
+            {/* Footer */}
+            <footer className="border-t border-zinc-800 px-4 py-6 text-center">
+              <p className="text-xs text-zinc-600">
+                Curso interativo • Conteúdo educacional sobre canais faceless / dark no YouTube
+              </p>
+            </footer>
+          </main>
+
+          {toast && <Toast message={toast} onClose={() => setToast(null)} />}
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<App />);
+  </script>
+</body>
+</html>
